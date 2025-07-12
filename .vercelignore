@@ -6,7 +6,6 @@ node_modules
 *.log
 test
 coverage
-src
 tsconfig.json
 eslint.config.js
 .eslintrc.js
@@ -17,4 +16,5 @@ Dockerfile
 docker-compose.yml
 .dockerignore
 scripts
-# ВАЖНО: dist папка НЕ исключается - она нужна для serverless функции 
+# src папка НЕ исключается - она нужна для serverless функции
+# dist папка НЕ исключается - она нужна для serverless функции 
