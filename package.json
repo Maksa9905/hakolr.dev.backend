@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/src/main",
+    "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -26,7 +26,8 @@
     "db:docker": "docker-compose up -d postgres",
     "db:docker:stop": "docker-compose down",
     "prestart:prod": "npm run build",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run build && cp -r dist api/ && echo 'Copied dist to api/' && ls -la api/",
+    "vercel:build": "npm run build && cp -r dist api/ && ls -la api/"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
