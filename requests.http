@@ -1,0 +1,121 @@
+### Переменные
+@baseUrl = http://localhost:3001/api
+@token = your-jwt-token-here
+
+### Получить все теги
+GET {{baseUrl}}/tags
+
+### Создать новый тег
+POST {{baseUrl}}/tags
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "label": "JavaScript"
+}
+
+### Получить тег по ID
+GET {{baseUrl}}/tags/tag-id-here
+
+### Обновить тег
+PATCH {{baseUrl}}/tags/tag-id-here
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "label": "TypeScript"
+}
+
+### Удалить тег
+DELETE {{baseUrl}}/tags/tag-id-here
+Authorization: Bearer {{token}}
+
+### ==========================================
+
+### Получить все публикации (первая страница, по умолчанию 10 постов)
+GET {{baseUrl}}/posts
+
+### Получить публикации с пагинацией
+GET {{baseUrl}}/posts?page=1&limit=5
+
+### Получить публикации второй страницы
+GET {{baseUrl}}/posts?page=2&limit=10
+
+### Фильтрация публикаций по одному тегу
+GET {{baseUrl}}/posts?tagIds=tag-id-here
+
+### Фильтрация публикаций по нескольким тегам (логика ИЛИ - пост должен содержать хотя бы один из указанных тегов)
+GET {{baseUrl}}/posts?tagIds=tag-id-1,tag-id-2
+
+### Фильтрация публикаций по заголовку
+GET {{baseUrl}}/posts?title=TypeScript
+
+### Поиск по содержимому (заголовок, описание, контент)
+GET {{baseUrl}}/posts?search=JavaScript
+
+### Комбинированная фильтрация (логика И): теги И поиск
+GET {{baseUrl}}/posts?tagIds=tag-id-1&search=JavaScript
+
+### Комбинированная фильтрация: (tag1 ИЛИ tag2) И поиск И заголовок
+GET {{baseUrl}}/posts?tagIds=tag-id-1,tag-id-2&search=React&title=Tutorial
+
+### Комбинированный запрос: пагинация + фильтрация по одному тегу
+GET {{baseUrl}}/posts?page=1&limit=5&tagIds=tag-id-here
+
+### Комбинированный запрос: пагинация + фильтрация по нескольким тегам
+GET {{baseUrl}}/posts?page=1&limit=5&tagIds=tag-id-1,tag-id-2
+
+### Комбинированный запрос: пагинация + поиск
+GET {{baseUrl}}/posts?page=1&limit=3&search=NestJS
+
+### Комбинированный запрос: все параметры
+GET {{baseUrl}}/posts?page=1&limit=5&tagIds=tag-id-1,tag-id-2&search=API
+
+### ==========================================
+### СТАТИСТИКА И ПОПУЛЯРНЫЕ ПОСТЫ
+
+### Получить статистику постов (3 последних + самый популярный + самый залайканный)
+GET {{baseUrl}}/posts/stats
+
+### ==========================================
+
+### Создать новую публикацию
+POST {{baseUrl}}/posts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Моя первая публикация в блоге",
+  "paragraph": "Это развернутое описание моей первой публикации в блоге. Здесь я расскажу о том, что побудило меня написать эту статью и что читатель может ожидать от неё.",
+  "description": "Краткое описание первой публикации",
+  "content": "# Заголовок статьи\n\nЭто содержимое статьи в формате **Markdown**.\n\n## Подзаголовок\n\n- Пункт 1\n- Пункт 2\n- Пункт 3\n\n```javascript\nconsole.log('Hello, World!');\n```",
+  "tagIds": ["tag-id-1", "tag-id-2"]
+}
+
+### Получить публикацию по ID (автоматически увеличивает просмотры)
+GET {{baseUrl}}/posts/post-id-here
+
+### ==========================================
+### ЛАЙКИ
+
+### Поставить лайк публикации
+POST {{baseUrl}}/posts/post-id-here/like
+
+### Убрать лайк с публикации
+DELETE {{baseUrl}}/posts/post-id-here/like
+
+### ==========================================
+
+### Обновить публикацию
+PATCH {{baseUrl}}/posts/post-id-here
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Обновленный заголовок публикации",
+  "content": "# Обновленное содержимое\n\nЭто обновленное содержимое статьи."
+}
+
+### Удалить публикацию
+DELETE {{baseUrl}}/posts/post-id-here
+Authorization: Bearer {{token}} 
