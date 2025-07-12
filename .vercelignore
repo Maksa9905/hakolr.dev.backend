@@ -16,4 +16,5 @@ README.md
 Dockerfile
 docker-compose.yml
 .dockerignore
-scripts 
+scripts
+# ВАЖНО: dist папка НЕ исключается - она нужна для serverless функции 

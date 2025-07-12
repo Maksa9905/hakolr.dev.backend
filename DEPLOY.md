@@ -2,7 +2,7 @@
 
 ## Важно: Пошаговое тестирование
 
-Мы создали простую тестовую версию для отладки проблем с деплоем.
+Мы обновили тестовую версию для отладки проблемы с папкой dist.
 
 ### Шаг 1: Тестирование базовой функциональности
 
@@ -21,32 +21,106 @@
 }
 ```
 
-### Шаг 2: Проверка сборки
+### Шаг 2: Отладка файловой системы
 
-Если базовая функциональность работает, endpoint будет показывать:
+Если базовая функциональность работает, проверьте:
+- `https://your-project.vercel.app/api/posts` (или любой другой endpoint)
+- Это покажет отладочную информацию о папке dist
+
+**Ожидаемый ответ:**
 ```json
 {
-  "status": "building",
-  "message": "Dist directory found, but NestJS initialization is disabled for testing",
-  "distFiles": ["src", "..."],
-  "timestamp": "2024-01-01T00:00:00.000Z"
+  "status": "debug",
+  "message": "Отладочная информация о файловой системе",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "distInfo": {
+    "/var/task/dist": {
+      "exists": true,
+      "isDirectory": true,
+      "files": ["src", "scripts"],
+      "filesCount": 3
+    }
+  },
+  "envInfo": {
+    "__dirname": "/var/task/api",
+    "process.cwd()": "/var/task"
+  },
+  "rootFiles": ["api", "dist", "package.json"]
 }
 ```
 
-### Шаг 3: Включение NestJS
+### Шаг 3: Решение проблемы с dist
 
-После успешного тестирования мы включим полную функциональность NestJS.
+Если папка dist не найдена, проверьте:
+1. Что `buildCommand` установлен в `npm run build`
+2. Что `includeFiles` включает `dist/**`
+3. Что `.vercelignore` НЕ исключает папку dist
+
+## Обновленная конфигурация
+
+### vercel.json
+```json
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "includeFiles": "dist/**"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/index.js"
+    }
+  ],
+  "installCommand": "npm install --production=false",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".",
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
+```
+
+### .vercelignore
+```
+node_modules
+.git
+.env
+.env.local
+.env.example
+*.log
+test
+coverage
+src
+tsconfig.json
+eslint.config.js
+.eslintrc.js
+.prettierrc
+jest.config.js
+README.md
+Dockerfile
+docker-compose.yml
+.dockerignore
+scripts
+# ВАЖНО: dist папка НЕ исключается - она нужна для serverless функции
+```
 
 ## Структура проекта для Vercel
 
 ```
 project/
 ├── api/
-│   └── index.js          # Тестовая serverless функция
+│   └── index.js          # Обновленная serverless функция с отладкой
 ├── src/                  # Исходный код NestJS
 ├── dist/                 # Собранный код (создается при сборке)
-├── vercel.json           # Конфигурация Vercel
-├── .vercelignore         # Исключения для Vercel
+├── vercel.json           # Обновленная конфигурация Vercel
+├── .vercelignore         # Обновленные исключения для Vercel
 └── package.json
 ```
 
@@ -58,9 +132,9 @@ project/
    ```
 
 2. **Убедитесь что есть все файлы:**
-   - `api/index.js` - тестовая функция
-   - `vercel.json` - конфигурация
-   - `.vercelignore` - исключения
+   - `api/index.js` - обновленная функция с отладкой
+   - `vercel.json` - обновленная конфигурация
+   - `.vercelignore` - обновленные исключения
    - `dist/` папка с собранным кодом
 
 ## Деплой на Vercel
@@ -110,8 +184,11 @@ DATABASE_URL=postgresql://user:password@host:port/database
 **Если получаете 200 OK** - функция работает ✅  
 **Если получаете ошибку** - проверьте логи в Vercel Dashboard
 
-### Шаг 2: Проверьте сборку
-Если health endpoint работает, проверьте что возвращается в `distFiles` массиве.
+### Шаг 2: Проверьте файловую систему
+Откройте `https://your-project.vercel.app/api/posts` (или любой другой endpoint)
+
+**Если видите "debug" статус** - получите информацию о папке dist ✅  
+**Если все еще ошибка** - проверьте настройки сборки
 
 ### Шаг 3: Проверьте логи
 В Vercel Dashboard:
@@ -121,15 +198,17 @@ DATABASE_URL=postgresql://user:password@host:port/database
 
 ## Общие проблемы
 
+### "Dist directory not found"
+**Решение:**
+1. Проверьте что `buildCommand` установлен как `npm run build`
+2. Убедитесь что `includeFiles`: `"dist/**"` добавлен в config
+3. Проверьте что `.vercelignore` не исключает папку dist
+4. Убедитесь что папка dist создается при сборке локально
+
 ### "This Serverless Function has crashed"
 1. Проверьте что `npm run build` работает локально
 2. Убедитесь что все переменные окружения установлены
 3. Проверьте логи для конкретных ошибок
-
-### "Cannot read dist directory"
-1. Убедитесь что Build Command установлен как `npm run build`
-2. Проверьте что папка `dist` создается при сборке
-3. Убедитесь что `.vercelignore` не исключает `dist`
 
 ### Timeout ошибки
 1. Функция может быть слишком медленной для cold start
@@ -138,7 +217,7 @@ DATABASE_URL=postgresql://user:password@host:port/database
 
 ## Следующие шаги
 
-После успешного тестирования мы:
+После успешного тестирования папки dist мы:
 1. Включим полную функциональность NestJS
 2. Подключим базу данных
 3. Настроим все API endpoints

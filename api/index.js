@@ -26,42 +26,64 @@ module.exports = async function handler(req, res) {
             return;
         }
 
-        // Проверяем доступность файлов
+        // Отладочная информация о файловой системе
         const path = require('path');
         const fs = require('fs');
 
-        const distPath = path.join(__dirname, '../dist');
-        console.log('Dist path:', distPath);
+        // Проверяем разные возможные пути
+        const possiblePaths = [
+            path.join(__dirname, '../dist'),
+            path.join(__dirname, 'dist'),
+            path.join(process.cwd(), 'dist'),
+            '/var/task/dist',
+            './dist'
+        ];
 
-        let distFiles = [];
+        let distInfo = {};
+
+        for (const distPath of possiblePaths) {
+            try {
+                const stats = fs.statSync(distPath);
+                const files = fs.readdirSync(distPath);
+                distInfo[distPath] = {
+                    exists: true,
+                    isDirectory: stats.isDirectory(),
+                    files: files.slice(0, 10), // первые 10 файлов
+                    filesCount: files.length
+                };
+            } catch (e) {
+                distInfo[distPath] = {
+                    exists: false,
+                    error: e.message
+                };
+            }
+        }
+
+        // Информация о текущем окружении
+        const envInfo = {
+            __dirname: __dirname,
+            'process.cwd()': process.cwd(),
+            'process.env.NODE_ENV': process.env.NODE_ENV,
+            'process.env.VERCEL': process.env.VERCEL,
+            'process.env.VERCEL_ENV': process.env.VERCEL_ENV,
+        };
+
+        // Список файлов в корне
+        let rootFiles = [];
         try {
-            distFiles = fs.readdirSync(distPath);
-            console.log('Files in dist:', distFiles);
+            rootFiles = fs.readdirSync(process.cwd());
         } catch (e) {
-            console.error('Cannot read dist directory:', e);
-            res.status(500).json({
-                error: 'Dist directory not found',
-                message: e.message,
-                distPath: distPath,
-            });
-            return;
+            rootFiles = ['Error reading root: ' + e.message];
         }
 
-        // Пробуем загрузить NestJS только если dist доступен
-        if (distFiles.length > 0) {
-            res.status(200).json({
-                status: 'building',
-                message: 'Dist directory found, but NestJS initialization is disabled for testing',
-                distFiles: distFiles,
-                timestamp: new Date().toISOString(),
-            });
-        } else {
-            res.status(500).json({
-                error: 'No files in dist directory',
-                distPath: distPath,
-                timestamp: new Date().toISOString(),
-            });
-        }
+        res.status(200).json({
+            status: 'debug',
+            message: 'Отладочная информация о файловой системе',
+            timestamp: new Date().toISOString(),
+            distInfo: distInfo,
+            envInfo: envInfo,
+            rootFiles: rootFiles.slice(0, 20), // первые 20 файлов
+        });
 
     } catch (error) {
         console.error('Handler error:', error);
