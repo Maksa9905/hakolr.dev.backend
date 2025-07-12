@@ -25,7 +25,8 @@
     "db:special-tags": "npx ts-node scripts/create-special-tags.ts",
     "db:docker": "docker-compose up -d postgres",
     "db:docker:stop": "docker-compose down",
-    "prestart:prod": "npm run build"
+    "prestart:prod": "npm run build",
+    "vercel-build": "npm run build"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -60,6 +61,7 @@
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^10.0.0",
+    "@vercel/node": "^3.2.29",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
