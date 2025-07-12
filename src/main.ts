@@ -41,13 +41,8 @@ async function bootstrap() {
   );
 }
 
-// Для локальной разработки
-if (require.main === module) {
-  bootstrap().catch((error) => {
-    console.error('❌ Ошибка запуска сервера:', error);
-    process.exit(1);
-  });
-}
-
-// Экспорт для serverless функций
-export { bootstrap };
+// Запуск приложения
+bootstrap().catch((error) => {
+  console.error('❌ Ошибка запуска сервера:', error);
+  process.exit(1);
+});
