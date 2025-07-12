@@ -14,6 +14,37 @@ Authorization: Bearer {{token}}
   "label": "JavaScript"
 }
 
+### Создать тег с флагом "Самый популярный"
+POST {{baseUrl}}/tags
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "label": "Самый популярный",
+  "isMostPopular": true
+}
+
+### Создать тег с флагом "Самый залайканный"
+POST {{baseUrl}}/tags
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "label": "Самый залайканный",
+  "isMostLiked": true
+}
+
+### Создать тег с обоими флагами
+POST {{baseUrl}}/tags
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "label": "Специальный тег",
+  "isMostPopular": true,
+  "isMostLiked": true
+}
+
 ### Получить тег по ID
 GET {{baseUrl}}/tags/tag-id-here
 
@@ -24,6 +55,17 @@ Authorization: Bearer {{token}}
 
 {
   "label": "TypeScript"
+}
+
+### Обновить тег с флагами
+PATCH {{baseUrl}}/tags/tag-id-here
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "label": "Обновленный тег",
+  "isMostPopular": true,
+  "isMostLiked": false
 }
 
 ### Удалить тег
