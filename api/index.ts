@@ -2,8 +2,10 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from '../src/app/app.module';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import express from 'express';
+import { Request, Response } from 'express';
 import 'dotenv/config';
+
+const express = require('express');
 
 let app: any;
 
@@ -41,10 +43,10 @@ async function createNestApp() {
   return expressApp;
 }
 
-export default async function handler(req: any, res: any) {
+export default async function handler(req: Request, res: Response) {
   if (!app) {
     app = await createNestApp();
   }
 
-  return app(req, res);
+  app(req, res);
 }
