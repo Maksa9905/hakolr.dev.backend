@@ -10,19 +10,15 @@ export const databaseConfig: TypeOrmModuleOptions = {
   password: process.env.DB_PASSWORD || '123',
   database: process.env.DB_DATABASE || 'hakolr_blog',
   entities: [Post, Tag],
-  synchronize:
-    process.env.NODE_ENV !== 'production' &&
-    process.env.TYPEORM_SYNCHRONIZE !== 'false',
+  synchronize: process.env.TYPEORM_SYNCHRONIZE !== 'false',
   logging:
     process.env.TYPEORM_LOGGING === 'true' ||
     process.env.NODE_ENV !== 'production',
-  // Дополнительные настройки для продакшена
   ssl:
     process.env.NODE_ENV === 'production'
       ? { rejectUnauthorized: false }
       : false,
   extra: {
-    // Настройки пула соединений
     max: 10,
     min: 2,
     acquireTimeoutMillis: 30000,
