@@ -6,7 +6,6 @@ node_modules
 *.log
 test
 coverage
-tsconfig.json
 eslint.config.js
 .eslintrc.js
 .prettierrc
