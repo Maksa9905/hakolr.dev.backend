@@ -21,7 +21,11 @@
     "strict": false,
     "noImplicitReturns": false,
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "useDefineForClassFields": false,
+    "lib": ["ES2020", "DOM"]
   },
   "include": ["src/**/*", "api/**/*"],
   "exclude": ["node_modules", "dist", "test", "**/*spec.ts"]
