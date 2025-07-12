@@ -1,106 +1,131 @@
 # Деплой на Vercel
 
-## Преимущества Vercel
+## Структура проекта для Vercel
 
-- ✅ Бесплатный тарифный план (100 GB трафика, 100 деплоев в месяц)
-- ✅ Простая интеграция с GitHub
-- ✅ Автоматические деплои при push
-- ✅ Поддержка serverless функций
-- ✅ CDN и быстрое развертывание
+```
+project/
+├── api/
+│   └── index.js          # Serverless функция для Vercel
+├── src/                  # Исходный код NestJS
+├── dist/                 # Собранный код (создается при сборке)
+├── vercel.json           # Конфигурация Vercel
+└── package.json
+```
 
 ## Подготовка к деплою
 
-1. Убедитесь что проект собирается:
+1. **Соберите проект:**
    ```bash
    npm run build
    ```
 
-2. Загрузите код в GitHub репозиторий
+2. **Убедитесь что есть все файлы:**
+   - `api/index.js` - точка входа для Vercel
+   - `vercel.json` - конфигурация
+   - `dist/` папка с собранным кодом
 
-## Деплой
+## Деплой на Vercel
 
-### Шаг 1: Регистрация на Vercel
-1. Зарегистрируйтесь на [Vercel](https://vercel.com/)
-2. Подключите свой GitHub аккаунт
+### Шаг 1: Настройка проекта
+1. Зайдите на [Vercel](https://vercel.com/)
+2. Подключите GitHub репозиторий
+3. **Важно**: Выберите "Other" как Framework preset
 
-### Шаг 2: Создание проекта
-1. Нажмите "New Project"
-2. Выберите репозиторий `hakolr.dev.backend`
-3. Выберите "Other" как Framework preset
-
-### Шаг 3: Настройка проекта
-В настройках проекта:
+### Шаг 2: Настройки сборки
+В разделе "Build & Output Settings":
 - **Build Command**: `npm run build`
-- **Output Directory**: Оставьте пустым
-- **Install Command**: `npm install`
+- **Output Directory**: оставьте пустым
+- **Install Command**: `npm install --production=false`
 
-### Шаг 4: Настройка переменных окружения
-В разделе "Environment Variables" добавьте:
+### Шаг 3: Переменные окружения
+Добавьте в "Environment Variables":
 
+**Обязательные:**
 ```
 NODE_ENV=production
-TELEGRAM_BOT_TOKEN=ваш_токен_бота
-ADMIN_LOGIN=ваш_логин
-ADMIN_PASSWORD=ваш_пароль
-JWT_SECRET=ваш_jwt_секрет
-DATABASE_URL=строка_подключения_к_базе
+JWT_SECRET=your-super-secret-key-here
+ADMIN_LOGIN=your-admin-username
+ADMIN_PASSWORD=your-admin-password
 ```
 
-### Шаг 5: Настройка базы данных
-Для PostgreSQL можно использовать:
-- [Neon](https://neon.tech/) - бесплатный PostgreSQL
-- [PlanetScale](https://planetscale.com/) - бесплатный MySQL
-- [Supabase](https://supabase.com/) - бесплатный PostgreSQL
+**Telegram бот:**
+```
+TELEGRAM_BOT_TOKEN=your-bot-token-from-botfather
+```
 
-#### Пример для Neon:
-1. Создайте аккаунт на [Neon](https://neon.tech/)
-2. Создайте базу данных
-3. Скопируйте строку подключения
-4. Добавьте в переменные окружения как `DATABASE_URL`
+**База данных (см. следующий шаг):**
+```
+DATABASE_URL=postgresql://user:password@host:port/database
+```
 
-### Шаг 6: Деплой
+### Шаг 4: Настройка базы данных
+
+#### Вариант 1: Neon (рекомендуется)
+1. Зайдите на [Neon](https://neon.tech/)
+2. Создайте бесплатный аккаунт
+3. Создайте новую базу данных
+4. Скопируйте connection string
+5. Добавьте в Vercel как `DATABASE_URL`
+
+#### Вариант 2: Supabase
+1. Зайдите на [Supabase](https://supabase.com/)
+2. Создайте проект
+3. Получите connection string из Settings → Database
+4. Добавьте в Vercel как `DATABASE_URL`
+
+### Шаг 5: Деплой
 1. Нажмите "Deploy"
-2. Vercel автоматически задеплоит проект
+2. Дождитесь завершения сборки
 3. Получите URL (например: `https://your-project.vercel.app`)
 
 ## Проверка работы
 
-1. Откройте `https://your-project.vercel.app/api/posts`
-2. Должен вернуться JSON с постами
-3. Проверьте Telegram бот - отправьте `/start`
+1. **API endpoints:**
+   - `https://your-project.vercel.app/api/posts`
+   - `https://your-project.vercel.app/api/tags`
 
-## Автоматические деплои
+2. **Telegram бот:**
+   - Отправьте `/start` боту
+   - Должен вернуть JWT токен и ссылку на фронтенд
 
-Vercel автоматически деплоит:
-- Production деплой при push в `main` ветку
-- Preview деплой при создании pull request
+## Важные особенности
 
-## Мониторинг
+### Холодный старт
+- Первый запрос может занять 3-5 секунд
+- Это нормально для serverless функций
+- Последующие запросы будут быстрее
 
-- Логи доступны в дашборде Vercel
-- Функциональная аналитика показывает производительность
-- Настройте алерты для ошибок
-
-## Лимиты бесплатного плана
-
+### Лимиты Vercel (бесплатный план)
 - 100 GB трафика в месяц
 - 100 деплоев в месяц
-- 10 секунд максимальное время выполнения функции
-- 50 MB максимальный размер функции
+- 10 секунд максимальное время выполнения
 
-## Обновления
-
-Для обновления просто сделайте `git push` в main ветку.
+### Автоматические деплои
+- Production: push в `main` ветку
+- Preview: создание pull request
 
 ## Troubleshooting
 
-### Проблемы с холодным стартом
-- Первый запрос может быть медленным (~3-5 сек)
-- Это нормально для serverless функций
+### Ошибка "No Production Deployment"
+- Проверьте что `npm run build` выполняется без ошибок
+- Убедитесь что `api/index.js` существует
+- Проверьте конфигурацию `vercel.json`
 
-### Проблемы с базой данных
+### Ошибки базы данных
 - Убедитесь что `DATABASE_URL` правильно настроен
 - Проверьте что база данных доступна из интернета
+- Для Neon: используйте connection string с `?sslmode=require`
 
-### Проблемы с CORS
-- Добавьте домен фронтенда в `origin` массив в `main.ts` 
+### 500 Internal Server Error
+- Проверьте логи в Vercel dashboard
+- Убедитесь что все переменные окружения настроены
+- Проверьте что JWT_SECRET установлен
+
+### CORS ошибки
+- Убедитесь что домен фронтенда добавлен в `main.ts`
+- Проверьте что `credentials: true` настроен правильно
+
+## Мониторинг
+- Логи: Vercel Dashboard → Functions → View Function Logs
+- Метрики: Vercel Dashboard → Analytics
+- Alerts: Vercel Dashboard → Settings → Notifications 
