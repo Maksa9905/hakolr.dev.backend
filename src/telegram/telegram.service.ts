@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import * as TelegramBot from 'node-telegram-bot-api';
+import TelegramBot from 'node-telegram-bot-api';
 import { AuthService } from '../auth/auth.service';
 
 interface UserSession {
